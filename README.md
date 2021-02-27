@@ -3,6 +3,8 @@ Small program to merge Oxford Nanopore Technologies sequencing runs that were st
 
 #Usage:
 
-merge_runs.py -r /path/to/run if all fastq_pass directories in a run directory should be merged 
+If all fastq_pass directories in a run directory should be merged:
+merge_runs.py -r /path/to/run 
 
+If only specific fastq_pass directories should be merged:
 merge_run.py -r /path/to/run -d /path/to/fastq_passA /path/to/fastq_passB ... (space separated paths)
