@@ -3,14 +3,8 @@
 import os
 import sys
 import argparse
-import logging
-import subprocess
-import re
 from pathlib import Path
-import datetime
 import glob
-import time
-import pandas as pd
 from shutil import copyfile
 from itertools import groupby
 
@@ -98,7 +92,7 @@ print('Created links to fast5_pass files in ' + RUN + '/merge/fastq_pass')
 
 ##Find all sequencing summary files:
 seqfiles = glob.glob(RUN + '/**/sequencing_summary_*', recursive=True)
-seqfiles.remove(RUN + '/merge/sequencing_summary_merged.txt')
+if RUN + '/merge/sequencing_summary_merged.txt' in seqfiles: seqfiles.remove(RUN + '/merge/sequencing_summary_merged.txt')
 print(seqfiles)
 
 with open(RUN + '/merge/sequencing_summary_merged.txt', 'w') as outfile:
