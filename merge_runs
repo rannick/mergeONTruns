@@ -22,12 +22,15 @@ ii) -d select the fastq_pass directories you want to merge (in case you basecall
 link that directory and not the initial fastq_pass directory)', 
 formatter_class=lambda prog: argparse.HelpFormatter(prog,max_help_position=30,width=200))
 parser.add_argument('--run','-r', action='store', dest='run', type=str, required=True, metavar='RUNID', help='Path to the run you want to merge. Example: /media/ngs/NAME_OF_STORAGE/RUN_NAME')
-parser.add_argument('--dir','-d', action='store', dest='fastqPassDirs', nargs='*', help='Path to the fastq_pass directories you want to merge. Example: /media/ngs/NAME_OF_STORAGE/RUN_NAME/no_sample/FAL...../fastq_pass /media/ngs/NAME_OF_STORAGE/RUN_NAME/no_sample/FAL...../fastq_pass')
+parser.add_argument('--dirfastq','-dq', action='store', dest='fastqPassDirs', nargs='*', help='Path to the fastq_pass directories you want to merge. Example: /media/ngs/NAME_OF_STORAGE/RUN_NAME/no_sample/FAL...../fastq_pass /media/ngs/NAME_OF_STORAGE/RUN_NAME/no_sample/FAL...../fastq_pass')
+parser.add_argument('--dirfast5','-d5', action='store', dest='fast5PassDirs', nargs='*', help='Path to the fast5_pass directories you want to merge. Example: /media/ngs/NAME_OF_STORAGE/RUN_NAME/no_sample/FAL...../fast5_pass /media/ngs/NAME_OF_STORAGE/RUN_NAME/no_sample/FAL...../fast5_pass')
+
 
 inputArgs = parser.parse_args()
 RUN = inputArgs.run
 
 os.makedirs(RUN + '/merge/fastq_pass',exist_ok=True)
+os.makedirs(RUN + '/merge/fast5_pass',exist_ok=True)
 
 
 FastqDirectories= list()
@@ -36,6 +39,17 @@ if not inputArgs.fastqPassDirs:
 else:
     FastqDirectories = [glob.glob(fastqdir + '/barcode*') for fastqdir in inputArgs.fastqPassDirs]
     FastqDirectories = [val for sublist in FastqDirectories for val in sublist]
+
+Fast5Directories= list()
+if not inputArgs.fast5PassDirs:
+    Fast5Directories = glob.glob(RUN +"/*/*/fast5_pass/barcode*")
+else:
+    Fast5Directories = [glob.glob(fast5dir + '/barcode*') for fast5dir in inputArgs.fast5PassDirs]
+    Fast5Directories = [val for sublist in Fast5Directories for val in sublist]
+
+
+
+
 
 grouped = {}
 keys = []
@@ -54,7 +68,33 @@ for key in keys:
             os.symlink(fastq, dstDir + '/'+fileNameFastq)
 
 
+
 print('Created links to fastq_pass files in ' + RUN + '/merge/fastq_pass')
+
+
+grouped = {}
+keys = []
+for elem in Fast5Directories:
+    key = elem.split('/')[-1]
+    grouped.setdefault(key, []).append(elem)
+    keys.append(key)
+
+for key in keys:
+    dstDir = RUN + '/merge/fast5_pass/' + key 
+    os.makedirs(dstDir,exist_ok=True)
+    fast5Files = glob.glob(RUN +'/*/*/fast5_pass/'+key+ '/*.fast5*')
+    for fast5 in fast5Files:
+        fileNameFast5 =  fast5.split('/')[-1]
+        if not (os.path.islink(dstDir + '/'+fileNameFast5)):
+            os.symlink(fastq, dstDir + '/'+fileNameFast5)
+
+
+print('Created links to fast5_pass files in ' + RUN + '/merge/fastq_pass')
+
+
+
+
+
 
 ##Find all sequencing summary files:
 seqfiles = glob.glob(RUN + '/**/sequencing_summary_*', recursive=True)
@@ -66,4 +106,5 @@ with open(RUN + '/merge/sequencing_summary_merged.txt', 'w') as outfile:
             with open(seqfile) as infile:
                 for line in infile:
                     outfile.write(line)
+
 
