@@ -82,10 +82,10 @@ for key in keys:
     for fast5 in fast5Files:
         fileNameFast5 =  fast5.split('/')[-1]
         if not (os.path.islink(dstDir + '/'+fileNameFast5)):
-            os.symlink(fastq, dstDir + '/'+fileNameFast5)
+            os.symlink(fast5, dstDir + '/'+fileNameFast5)
 
 
-print('Created links to fast5_pass files in ' + RUN + '/merge/fastq_pass')
+print('Created links to fast5_pass files in ' + RUN + '/merge/fast5_pass')
 
 
 
