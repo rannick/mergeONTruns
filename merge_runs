@@ -95,8 +95,9 @@ print('Created links to fast5_pass files in ' + RUN + '/merge/fast5_pass')
 ##Find all sequencing summary files:
 seqfiles = glob.glob(inputArgs.run + '/**/sequencing_summary*', recursive=True)
 if RUN + '/merge/sequencing_summary_merged.txt' in seqfiles: seqfiles.remove(RUN + '/merge/sequencing_summary_merged.txt')
-print(seqfiles)
 
+seqfiles.sort()
+print(seqfiles)
 with open(RUN + '/merge/sequencing_summary_merged.txt', 'w') as outfile:
         for seqfile in seqfiles:
             with open(seqfile) as infile:
