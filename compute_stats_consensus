@@ -1,0 +1,22 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+import argparse
+from pathlib import Path
+import glob
+from shutil import copyfile
+from itertools import groupby
+
+
+parser = argparse.ArgumentParser(prog='compute_stats_consensus', 
+description='Generate statistics on a consensus)', 
+formatter_class=lambda prog: argparse.HelpFormatter(prog,max_help_position=30,width=200))
+parser.add_argument('-f', action='store', dest='consensus', type=str, required=True, help='Path to consensus')
+
+inputArgs = parser.parse_args()
+
+with open(inputArgs.consensus, "r") as f:
+    rows = f.readlines()[1:]
+
+print(len(rows.join('')))
