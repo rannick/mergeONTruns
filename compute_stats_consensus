@@ -18,5 +18,14 @@ inputArgs = parser.parse_args()
 
 with open(inputArgs.consensus, "r") as f:
     rows = f.readlines()[1:]
+tot = len(''.join(rows))
 
-print(len(rows.join('')))
+nbN = (''.join(rows)).count('N')
+
+called = 100 - (nbN/tot)*100
+
+
+
+print('Total number of bases: '+str(tot))
+
+print('Number of bases called: %.2f' % called)
