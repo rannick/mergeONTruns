@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import argparse
+from pathlib import Path
+import glob
+
+
+parser = argparse.ArgumentParser(prog='plot_depth', 
+description='Plot depths files generated from ARTIC pipeline)', 
+formatter_class=lambda prog: argparse.HelpFormatter(prog,max_help_position=30,width=200))
+parser.add_argument('--run','-r', action='store', dest='run', type=str, required=True, metavar='RUNID', help='Path to the run files you want to plot. Example: $HOME/Desktop/NGS-data/site-year-runXX_ANALYSIS')
+
+inputArgs = parser.parse_args()
+
+depth_files = glob.glob(inputArgs.run +"/*.depths")
+
+for file in depth_files:
+    cov = pd.read_csv(file, sep='\t', names=['Ref','Pool','Position','Coverage'])
+
+# plt.rc('sans-serif':['Arial'], 'size':20})
+    fig, ax = plt.subplots(figsize=(20,10))
+
+    fig.set_size_inches(20,10)
+    ax.plot(cov['Coverage'], color='xkcd:denim blue',linewidth=3)
+    ax.set_facecolor('white')
+    # ax.axhline(y=20, linewidth=3, color='black',alpha=0.5, linestyle='dashed', label='20x')
+
+    ax.set_xlabel('Nucleotide position', size=20,weight='bold')
+    ax.set_ylabel('Number of reads', size=20,weight='bold')
+    # ax.get_xaxis().set_label_coords(0.5,-0.07)
+    # ax.get_yaxis().set_label_coords(-0.07,0.5)
+    ax.tick_params(axis='both', which='major', labelsize=18)
+    
+    print(file+'.png')
+    ax.set_title(file.split('/')[-1], fontdict={'fontsize': 20, 'fontweight': 'bold'})
+    # ax.title.set_position((0.5,1.15))
+    plt.savefig(file+'.png')    
+    plt.close()
+
+
