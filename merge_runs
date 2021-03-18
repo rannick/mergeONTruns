@@ -31,14 +31,14 @@ os.makedirs(RUN + '/merge/fast5_pass',exist_ok=True)
 
 FastqDirectories= list()
 if not inputArgs.fastqPassDirs:
-    FastqDirectories = glob.glob(inputArgs.run +"**/fastq_pass/barcode*")
+    FastqDirectories = glob.glob(inputArgs.run +"/**/fastq_pass/barcode*", recursive=True)
 else:
     FastqDirectories = [glob.glob(fastqdir + '/barcode*') for fastqdir in inputArgs.fastqPassDirs]
     FastqDirectories = [val for sublist in FastqDirectories for val in sublist]
 
 Fast5Directories= list()
 if not inputArgs.fast5PassDirs:
-    Fast5Directories = glob.glob(inputArgs.run +"**/fast5_pass/barcode*")
+    Fast5Directories = glob.glob(inputArgs.run +"/**/fast5_pass/barcode*", recursive=True)
 else:
     Fast5Directories = [glob.glob(fast5dir + '/barcode*') for fast5dir in inputArgs.fast5PassDirs]
     Fast5Directories = [val for sublist in Fast5Directories for val in sublist]
@@ -57,7 +57,7 @@ for elem in FastqDirectories:
 for key in keys:
     dstDir = RUN + '/merge/fastq_pass/' + key 
     os.makedirs(dstDir,exist_ok=True)
-    fastqFiles = glob.glob(inputArgs.run +'**/fastq_pass/'+key+ '/*.fastq*')
+    fastqFiles = glob.glob(inputArgs.run +'/**/fastq_pass/'+key+ '/*.fastq*', recursive=True)
     for fastq in fastqFiles:
         fileNameFastq =  fastq.split('/')[-1]
         if not (os.path.islink(dstDir + '/'+fileNameFastq)):
@@ -78,7 +78,7 @@ for elem in Fast5Directories:
 for key in keys:
     dstDir = RUN + '/merge/fast5_pass/' + key 
     os.makedirs(dstDir,exist_ok=True)
-    fast5Files = glob.glob(inputArgs.run +'**/fast5_pass/'+key+ '/*.fast5*')
+    fast5Files = glob.glob(inputArgs.run +'/**/fast5_pass/'+key+ '/*.fast5*', recursive=True)
     for fast5 in fast5Files:
         fileNameFast5 =  fast5.split('/')[-1]
         if not (os.path.islink(dstDir + '/'+fileNameFast5)):
@@ -93,7 +93,7 @@ print('Created links to fast5_pass files in ' + RUN + '/merge/fast5_pass')
 
 
 ##Find all sequencing summary files:
-seqfiles = glob.glob(inputArgs.run + '**/sequencing_summary*', recursive=True)
+seqfiles = glob.glob(inputArgs.run + '/**/sequencing_summary*', recursive=True)
 if RUN + '/merge/sequencing_summary_merged.txt' in seqfiles: seqfiles.remove(RUN + '/merge/sequencing_summary_merged.txt')
 
 seqfiles.sort()
