@@ -58,6 +58,7 @@ for key in keys:
     dstDir = RUN + '/merge/fastq_pass/' + key 
     os.makedirs(dstDir,exist_ok=True)
     fastqFiles = glob.glob(inputArgs.run +'/**/fastq_pass/'+key+ '/*.fastq*', recursive=True)
+
     for fastq in fastqFiles:
         fileNameFastq =  fastq.split('/')[-1]
         if not (os.path.islink(dstDir + '/'+fileNameFastq)):
@@ -79,6 +80,7 @@ for key in keys:
     dstDir = RUN + '/merge/fast5_pass/' + key 
     os.makedirs(dstDir,exist_ok=True)
     fast5Files = glob.glob(inputArgs.run +'/**/fast5_pass/'+key+ '/*.fast5*', recursive=True)
+    fast5File.append(glob.glob(inputArgs.run +'/**/fast5_skip/*.fast5*')
     for fast5 in fast5Files:
         fileNameFast5 =  fast5.split('/')[-1]
         if not (os.path.islink(dstDir + '/'+fileNameFast5)):
