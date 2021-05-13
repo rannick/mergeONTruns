@@ -39,12 +39,14 @@ else:
 Fast5Directories= list()
 if not inputArgs.fast5PassDirs:
     Fast5Directories = glob.glob(inputArgs.run +"/**/fast5_pass/barcode*", recursive=True)
+    if not Fast5Directories:
+        Fast5Directories = glob.gob(inputArgs.run + "/**/fast5_pass", recursive=True)
 else:
     Fast5Directories = [glob.glob(fast5dir + '/barcode*') for fast5dir in inputArgs.fast5PassDirs]
     Fast5Directories = [val for sublist in Fast5Directories for val in sublist]
 
 
-print(FastqDirectories)
+#print(FastqDirectories)
 
 
 grouped = {}
