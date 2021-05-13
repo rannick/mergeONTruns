@@ -78,10 +78,17 @@ for elem in Fast5Directories:
     grouped.setdefault(key, []).append(elem)
     keys.append(key)
 
+
 for key in keys:
-    dstDir = RUN + '/merge/fast5_pass/' + key 
-    os.makedirs(dstDir,exist_ok=True)
-    fast5Files = glob.glob(inputArgs.run +'/**/fast5_pass/'+key+ '/*.fast5*', recursive=True)
+    if "barcode" not in key:
+        dstDir = RUN + '/merge/fast5_pass'
+        os.makedirs(dstDir,exist_ok=True)
+        fast5Files = glob.glob(inputArgs.run +'/**/fast5_pass/*.fast5*', recursive=True)
+    
+    else:
+        dstDir = RUN + '/merge/fast5_pass/' + key 
+        os.makedirs(dstDir,exist_ok=True)
+        fast5Files = glob.glob(inputArgs.run +'/**/fast5_pass/'+key+ '/*.fast5*', recursive=True)
 
     for fast5 in fast5Files:
         fileNameFast5 =  fast5.split('/')[-1]
