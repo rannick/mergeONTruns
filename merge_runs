@@ -44,7 +44,7 @@ else:
     Fast5Directories = [val for sublist in Fast5Directories for val in sublist]
 
 
-
+print(FastqDirectories)
 
 
 grouped = {}
