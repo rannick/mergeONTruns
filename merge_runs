@@ -39,12 +39,14 @@ else:
 Fast5Directories= list()
 if not inputArgs.fast5PassDirs:
     Fast5Directories = glob.glob(inputArgs.run +"/**/fast5_pass/barcode*", recursive=True)
+    if not Fast5Directories:
+        Fast5Directories = glob.glob(inputArgs.run + "/**/fast5_pass", recursive=True)
 else:
     Fast5Directories = [glob.glob(fast5dir + '/barcode*') for fast5dir in inputArgs.fast5PassDirs]
     Fast5Directories = [val for sublist in Fast5Directories for val in sublist]
 
 
-
+#print(FastqDirectories)
 
 
 grouped = {}
@@ -76,10 +78,17 @@ for elem in Fast5Directories:
     grouped.setdefault(key, []).append(elem)
     keys.append(key)
 
+
 for key in keys:
-    dstDir = RUN + '/merge/fast5_pass/' + key 
-    os.makedirs(dstDir,exist_ok=True)
-    fast5Files = glob.glob(inputArgs.run +'/**/fast5_pass/'+key+ '/*.fast5*', recursive=True)
+    if "barcode" not in key:
+        dstDir = RUN + '/merge/fast5_pass'
+        os.makedirs(dstDir,exist_ok=True)
+        fast5Files = glob.glob(inputArgs.run +'/**/fast5_pass/*.fast5*', recursive=True)
+    
+    else:
+        dstDir = RUN + '/merge/fast5_pass/' + key 
+        os.makedirs(dstDir,exist_ok=True)
+        fast5Files = glob.glob(inputArgs.run +'/**/fast5_pass/'+key+ '/*.fast5*', recursive=True)
 
     for fast5 in fast5Files:
         fileNameFast5 =  fast5.split('/')[-1]
