@@ -7,6 +7,9 @@ from pathlib import Path
 import glob
 from shutil import copyfile
 from itertools import groupby
+import mmap
+
+
 
 
 parser = argparse.ArgumentParser(prog='merge_runs', 
@@ -31,42 +34,36 @@ os.makedirs(RUN + '/merge/fast5_pass',exist_ok=True)
 
 FastqDirectories= list()
 if not inputArgs.fastqPassDirs:
-    FastqDirectories = glob.glob(inputArgs.run +"/**/fastq_pass/barcode*", recursive=True)
+    FastqDirectories =list(set(glob.glob(inputArgs.run +'/**/*pass/**/', recursive=True)) - set(glob.glob(inputArgs.run +'/**/fast5*/**/', recursive=True)) - set(glob.glob(inputArgs.run +'/**/*fail*/**/', recursive=True)))
 else:
-    FastqDirectories = [glob.glob(fastqdir + '/barcode*') for fastqdir in inputArgs.fastqPassDirs]
+    FastqDirectories = [glob.glob(fastqdir + '/**/',recursive=True) for fastqdir in inputArgs.fastqPassDirs]
     FastqDirectories = [val for sublist in FastqDirectories for val in sublist]
 
 Fast5Directories= list()
 if not inputArgs.fast5PassDirs:
-    Fast5Directories = glob.glob(inputArgs.run +"/**/fast5_pass/barcode*", recursive=True)
-    if not Fast5Directories:
-        Fast5Directories = glob.glob(inputArgs.run + "/**/fast5_pass", recursive=True)
+    Fast5Directories =list(set(glob.glob(inputArgs.run +'/**/fast5*/**/', recursive=True)) - set(glob.glob(inputArgs.run +'/**/*fastq*/**/', recursive=True)) - set(glob.glob(inputArgs.run +'/**/*fail*/**/', recursive=True)))
+    # if not Fast5Directories:
+    #     Fast5Directories = glob.glob(inputArgs.run + "/**/fast5_pass/**/", recursive=True)
 else:
     Fast5Directories = [glob.glob(fast5dir) for fast5dir in inputArgs.fast5PassDirs]
     Fast5Directories = [val for sublist in Fast5Directories for val in sublist]
 
 
-#print(FastqDirectories)
-
-
 grouped = {}
 keys = []
 for elem in FastqDirectories:
-    key = elem.split('/')[-1]
-    grouped.setdefault(key, []).append(elem)
-    keys.append(key)
-
-for key in keys:
+    if 'barcode' in elem:
+        key = elem.split('/')[-2]
+    else:
+        key = ''
     dstDir = RUN + '/merge/fastq_pass/' + key 
     os.makedirs(dstDir,exist_ok=True)
-    fastqFiles = glob.glob(inputArgs.run +'/**/fastq_pass/'+key+ '/*.fastq*', recursive=True)
+    fastqFiles = glob.glob(elem+ '/*.fastq*', recursive=True)
 
     for fastq in fastqFiles:
         fileNameFastq =  fastq.split('/')[-1]
         if not (os.path.islink(dstDir + '/'+fileNameFastq)):
             os.symlink(fastq, dstDir + '/'+fileNameFastq)
-
-
 
 print('Created links to fastq_pass files in ' + RUN + '/merge/fastq_pass')
 
@@ -80,43 +77,65 @@ for elem in Fast5Directories:
 
 
 for key in keys:
-    if "barcode" not in key:
-        dstDir = RUN + '/merge/fast5_pass'
-        os.makedirs(dstDir,exist_ok=True)
-        fast5Files = glob.glob(inputArgs.run +'/**/fast5_pass/*.fast5*', recursive=True)
-    
+    if 'barcode' in elem:
+        key = elem.split('/')[-2]
     else:
-        dstDir = RUN + '/merge/fast5_pass/' + key 
-        os.makedirs(dstDir,exist_ok=True)
-        fast5Files = glob.glob(inputArgs.run +'/**/fast5_pass/'+key+ '/*.fast5*', recursive=True)
+        key = ''
+    dstDir = RUN + '/merge/fast5_pass' + key
+    os.makedirs(dstDir,exist_ok=True)
+    fast5Files = glob.glob(elem +'/*.fast5*', recursive=True)
+    
+    # else:
+    #     dstDir = RUN + '/merge/fast5_pass/' + key 
+    #     os.makedirs(dstDir,exist_ok=True)
+    #     fast5Files = glob.glob(inputArgs.run +'/**/fast5_pass/'+key+ '/*.fast5*', recursive=True)
 
     for fast5 in fast5Files:
         fileNameFast5 =  fast5.split('/')[-1]
         if not (os.path.islink(dstDir + '/'+fileNameFast5)):
             os.symlink(fast5, dstDir + '/'+fileNameFast5)
 
-extraFiles = glob.glob(inputArgs.run +'/**/fast5_skip/*.fast5*')
-dstDir = RUN + '/merge/fast5_pass/' 
-for fast5 in extraFiles:
-        fileNameFast5 =  fast5.split('/')[-1]
-        if not (os.path.islink(dstDir + '/'+fileNameFast5)):
-            os.symlink(fast5, dstDir + '/'+fileNameFast5)
+# extraFiles = glob.glob(inputArgs.run +'/**/fast5_skip/*.fast5*')
+# dstDir = RUN + '/merge/fast5_pass/' 
+# for fast5 in extraFiles:
+#         fileNameFast5 =  fast5.split('/')[-1]
+#         if not (os.path.islink(dstDir + '/'+fileNameFast5)):
+#             os.symlink(fast5, dstDir + '/'+fileNameFast5)
+
+
+
 print('Created links to fast5_pass files in ' + RUN + '/merge/fast5_pass')
 
-
-
-
-
-
 ##Find all sequencing summary files:
-seqfiles = glob.glob(inputArgs.run + '/**/sequencing_summary.txt', recursive=True)
+seqfiles = glob.glob(inputArgs.run + '/**/sequencing_summary*.txt', recursive=True)
+print(seqfiles)
+demux_seqfiles = []
+for seqfile in seqfiles:
+    with open(seqfile, 'rb', 0) as file, \
+        mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ) as s:
+        if s.find(b'unclassified') != -1:
+            demux_seqfiles.append(seqfile)
+        el/se:
+
+    # print(seqfile)
+    # with open(seqfile) as f:
+    #     for i, line in enumerate(f):
+    #         # print(i)
+    #         # print(line)
+    #         if i == 2:
+    #             print(line.split('\t')[0])
+    #         elif i >2:
+    #             break
+    #     # elif i > 29:
+        #     break
+
 if RUN + '/merge/sequencing_summary_merged.txt' in seqfiles: seqfiles.remove(RUN + '/merge/sequencing_summary_merged.txt')
 
-seqfiles.sort()
-print(seqfiles)
+demux_seqfiles.sort()
+print(demux_seqfiles)
 with open(RUN + '/merge/sequencing_summary_merged.txt', 'w') as outfile:
-        for seqfile in seqfiles:
-            with open(seqfile) as infile:
+        for demux_seqfile in demux_seqfiles:
+            with open(demux_seqfile) as infile:
                 for line in infile:
                     outfile.write(line)
 
