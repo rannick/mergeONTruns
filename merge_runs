@@ -115,7 +115,7 @@ for seqfile in seqfiles:
         mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ) as s:
         if s.find(b'unclassified') != -1:
             demux_seqfiles.append(seqfile)
-        el/se:
+        # el/se:
 
     # print(seqfile)
     # with open(seqfile) as f:
