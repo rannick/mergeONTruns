@@ -8,6 +8,7 @@ import glob
 from shutil import copyfile
 from itertools import groupby
 
+from Bio import SeqIO
 
 parser = argparse.ArgumentParser(prog='compute_stats_consensus', 
 description='Generate statistics on a consensus)', 
@@ -16,14 +17,15 @@ parser.add_argument('-f', action='store', dest='consensus', type=str, required=T
 
 inputArgs = parser.parse_args()
 
-with open(inputArgs.consensus, "r") as f:
-    rows = f.readlines()[1:]
-tot = len(''.join(rows))
+fasta_sequences = SeqIO.parse(open(inputArgs.consensus),'fasta')
+# with open(output_file) as out_file:
+for fasta in fasta_sequences:
+    name, sequence = fasta.id, str(fasta.seq)
+    tot = len(sequence)
+    nbN = (sequence.count('N')
+    called = 100 - (nbN/tot)*100
+    print(name)
+    print('Total length of the consensus: '+str(tot))
+    print('Recovery: %.2f' % called)
+    print('Number of Ns: '+str(nbN))
 
-nbN = (''.join(rows)).count('N')
-
-called = 100 - (nbN/tot)*100
-
-print('Total length of the consensus: '+str(tot))
-
-print('Recovery: %.2f' % called)
