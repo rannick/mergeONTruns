@@ -22,7 +22,7 @@ fasta_sequences = SeqIO.parse(open(inputArgs.consensus),'fasta')
 for fasta in fasta_sequences:
     name, sequence = fasta.id, str(fasta.seq)
     tot = len(sequence)
-    nbN = (sequence.count('N')
+    nbN = (sequence.count('N'))
     called = 100 - (nbN/tot)*100
     print(name)
     print('Total length of the consensus: '+str(tot))
