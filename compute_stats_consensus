@@ -28,4 +28,5 @@ for fasta in fasta_sequences:
     print('Total length of the consensus: '+str(tot))
     print('Recovery: %.2f' % called)
     print('Number of Ns: '+str(nbN))
+    print('-------------------------------------------')
 
